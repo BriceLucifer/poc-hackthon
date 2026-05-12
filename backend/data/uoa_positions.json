@@ -1,0 +1,226 @@
+{
+  "source": "University of Auckland — University Preferred Contracting Positions Protocol 2024 (DRAFT, reviewed 15 Sept 2025)",
+  "ip_note": "IP positions are set by Auckland UniServices Ltd and are NOT covered by this document. Any IP-related clause should be referred to UniServices regardless of wording.",
+  "positions": [
+    {
+      "id": "POS-01",
+      "topic": "Insurance — Location of Project Delivery",
+      "category": "Insurance",
+      "preferred": "Wherever possible the project is delivered in New Zealand. Clinical Trials policy only covers NZ-delivered trials; overseas trials require additional insurance priced before contract.",
+      "acceptable": "Delivery in Australia, the United Kingdom, or the Pacific Region (where the contract is under NZ law).",
+      "escalation_to": "Risk Office (assesses whether additional insurances are required); execution per Research Contracts Delegation Schedule.",
+      "applies_to": ["any"],
+      "keywords": ["place of performance", "location of services", "delivered in", "performance location", "overseas delivery"]
+    },
+    {
+      "id": "POS-02",
+      "topic": "Insurance — Clinical Trials",
+      "category": "Insurance",
+      "preferred": "All industry-led sponsored clinical trials require an Indemnity and Compensation Agreement to be executed alongside the CTRA (NZACRes standardised indemnity).",
+      "acceptable": null,
+      "escalation_to": "Risk Office (for trials involving children under 5, pregnant people, or any offshore delivery component).",
+      "applies_to": ["Clinical Trial Research Agreement"],
+      "keywords": ["clinical trial", "indemnity and compensation agreement", "CTRA"]
+    },
+    {
+      "id": "POS-03",
+      "topic": "Clinical Trial Template",
+      "category": "Insurance",
+      "preferred": "Use the NZACRes Clinical Research Contract template incorporating Schedule 6 modifications. Up-front set-up fee in payment schedule, paid irrespective of recruitment targets.",
+      "acceptable": "Non-NZACRe templates are acceptable provided key Schedule 6 modifications are incorporated into the CTRA.",
+      "escalation_to": "Senior Manager, Research Grants and Contracts (for key Schedule 6 terms that cannot be incorporated).",
+      "applies_to": ["Clinical Trial Research Agreement"],
+      "keywords": ["clinical research contract", "NZACRe", "Schedule 6"]
+    },
+    {
+      "id": "POS-04",
+      "topic": "Foreign Currency",
+      "category": "Financial",
+      "preferred": "Payment made in NZD.",
+      "acceptable": "Foreign currencies under NZD$500,000 from countries with FX rates listed by FIRST.",
+      "escalation_to": "UoA Treasury via FIRST (for foreign currencies > NZD$500,000 or unlisted FX rates).",
+      "applies_to": ["any"],
+      "keywords": ["currency", "payment in", "USD", "GBP", "EUR", "AUD", "NZD"]
+    },
+    {
+      "id": "POS-05",
+      "topic": "Billing Schedule for International / Domestic Commercial Contracts",
+      "category": "Financial",
+      "preferred": "Upfront payment on execution required for international clients and domestic commercial activity.",
+      "acceptable": "International clients with offshore delivery → upfront payment required; other international subject to credit-risk assessment may proceed under standard terms.",
+      "escalation_to": "Credit and Collections Manager at STC (for non-standard billing schedules with international contracts).",
+      "applies_to": ["Commercial Research Contract", "Public Research Contract", "Research Subcontract", "Master Services Agreement", "Provision of Services Agreement", "Consultancy Services Agreement"],
+      "keywords": ["billing schedule", "milestone payment", "upfront payment", "advance payment", "invoicing schedule"]
+    },
+    {
+      "id": "POS-06",
+      "topic": "Taxation",
+      "category": "Financial",
+      "preferred": "NZ contracts: costs presented as 'excluding GST'. Overseas contracts: costs 'excluding any applicable taxes and duties, payable by the Client on any taxable supplies'.",
+      "acceptable": null,
+      "escalation_to": "Tax and Compliance team (where offshore Client requires UoA to incorporate offshore tax).",
+      "applies_to": ["any"],
+      "keywords": ["GST", "tax", "VAT", "taxable supplies", "withholding"]
+    },
+    {
+      "id": "POS-07",
+      "topic": "Liability Limitations and Exclusions",
+      "category": "Other Contractual",
+      "preferred": "Total liability (including under indemnities offered) limited to the lesser of: (a) amount paid under the contract / contract value (subject to liability limit in Research Contract Delegations) OR (b) NZD$500,000. Limited to direct losses caused by negligent acts/omissions or wilful misconduct of the University. Consequential or indirect losses, 'hold harmless', and loss of data/profit/revenue/savings/business/goodwill explicitly excluded.",
+      "acceptable": "Total liability limit (including indemnities) in line with Research Contract Delegations. Uncapped liability acceptable ONLY for Trusted Funders on contestable rounds. Indirect losses acceptable only if total exposure is capped per Delegations. Carve-outs from cap acceptable for: Fraud, Wilful default, Personal injury/death, statutory non-excludable liability, and confidentiality (only if client revenue < NZD$150M).",
+      "escalation_to": "Refer Research Grants and Contracts Delegations (and Portfolio Manager for Trusted Funders on non-contestable rounds).",
+      "applies_to": ["any"],
+      "keywords": ["liability", "limitation of liability", "consequential", "indirect", "loss of profit", "loss of data", "hold harmless", "liable for"]
+    },
+    {
+      "id": "POS-08",
+      "topic": "Indemnities",
+      "category": "Other Contractual",
+      "preferred": "No indemnities offered, except for Trusted Funders. Do not provide indemnities against IP infringement.",
+      "acceptable": "Only indemnify client for damage/injury occurring in course of contract from negligent acts/omissions or wilful misconduct of the University. Liability under indemnity explicitly included in Liability Limit. Must include proportionate reduction for client contributory negligence and obligations on each party to mitigate losses.",
+      "escalation_to": "Refer Research Contract Delegations.",
+      "applies_to": ["any"],
+      "keywords": ["indemnify", "indemnity", "indemnification", "hold harmless", "defend"]
+    },
+    {
+      "id": "POS-09",
+      "topic": "Insurance Policies",
+      "category": "Other Contractual",
+      "preferred": "Contract states UoA will maintain sufficient insurance cover to conduct the work, with no reference to explicit policy limits.",
+      "acceptable": "Specific request for insurance limits, where requested limits are at or below the University's current policy limits.",
+      "escalation_to": "Risk Office (for limits outside the agreed exception list).",
+      "applies_to": ["any"],
+      "keywords": ["insurance policy", "insurance cover", "policy limits", "professional indemnity insurance", "public liability insurance"]
+    },
+    {
+      "id": "POS-10",
+      "topic": "Warranties",
+      "category": "Other Contractual",
+      "preferred": "University only warrants (a) it has authority to enter into the contract and (b) performance will be to a professional standard / usual good practice. Contract MUST expressly exclude all other warranties (acknowledged this may not be possible for NZ and International Funding Agency contracts).",
+      "acceptable": "No other warranties offered.",
+      "escalation_to": "Senior Manager, Research Grants and Contracts.",
+      "applies_to": ["any"],
+      "keywords": ["warrant", "warranty", "warranties", "fitness for purpose", "merchantability", "non-infringement", "as is"]
+    },
+    {
+      "id": "POS-11",
+      "topic": "Confidentiality",
+      "category": "Other Contractual",
+      "preferred": "Definition of confidential information excludes information already public, independently developed, previously known by receiving party, and information legally required to be disclosed. UoA must be able to disclose to agents and Affiliates. Duration up to 5 years post-completion of confidentiality period.",
+      "acceptable": "Confidentiality obligations limited in time (e.g. 5–7 years post-termination/expiry/disclosure).",
+      "escalation_to": "Senior Manager, Research Grants and Contracts.",
+      "applies_to": ["any"],
+      "keywords": ["confidential", "confidentiality", "non-disclosure", "non disclosure", "NDA"]
+    },
+    {
+      "id": "POS-12",
+      "topic": "Publication",
+      "category": "Other Contractual",
+      "preferred": "Principal Investigator has the right to publish. Reasonable patent stand-down (no more than 60 days from issuing the request). Students retain publication rights for thesis or academic publication, including commercially sensitive content.",
+      "acceptable": "Stand-down before publication acceptable provided ≤ 12 months. Student-produced commercially sensitive content may be embargoed for max 12 months. For Consulting Contracts only, removal of publications clause permitted by PI if (i) academic doesn't need results for research/publication, (ii) services not expected to generate new knowledge, (iii) no students relying on the research for thesis.",
+      "escalation_to": "Senior Manager, Research Grants and Contracts. Embargo > 12 months → School of Graduate Studies.",
+      "applies_to": ["any"],
+      "keywords": ["publish", "publication", "thesis", "embargo", "dissertation", "right to publish"]
+    },
+    {
+      "id": "POS-13",
+      "topic": "Moral Rights",
+      "category": "Other Contractual",
+      "preferred": "Author (per Copyright Act 1994) retains authorship and copyright. Moral rights NEVER waived for thesis or academic publications.",
+      "acceptable": null,
+      "escalation_to": "Principal Investigator (academic/student); first instance consult Head of IP at UniServices. Waiver only by the rights-holder after thorough discussion. Waiver wording must be limited to scope of contract work.",
+      "applies_to": ["any"],
+      "keywords": ["moral rights", "waiver of moral rights", "authorship", "right of attribution", "right of integrity"]
+    },
+    {
+      "id": "POS-14",
+      "topic": "Publicity",
+      "category": "Other Contractual",
+      "preferred": "Neither party can use names or brands of the other or their personnel without prior written consent.",
+      "acceptable": null,
+      "escalation_to": "University Marketing (brand@auckland.ac.nz).",
+      "applies_to": ["any"],
+      "keywords": ["publicity", "use of name", "use of logo", "trade marks", "trademarks", "press release", "marketing materials"]
+    },
+    {
+      "id": "POS-15",
+      "topic": "Payment Terms",
+      "category": "Other Contractual",
+      "preferred": "20th of the month following date of invoice.",
+      "acceptable": null,
+      "escalation_to": "Credit and Collections Manager at STC.",
+      "applies_to": ["any"],
+      "keywords": ["payment terms", "days after invoice", "net 30", "net 60", "due date", "20th of the month"]
+    },
+    {
+      "id": "POS-16",
+      "topic": "Governing Law and Jurisdiction",
+      "category": "Other Contractual",
+      "preferred": "New Zealand.",
+      "acceptable": "Australia, the United Kingdom, Common European countries, Singapore. For US-based clients, non-exclusive jurisdiction of a specific US state is acceptable.",
+      "escalation_to": "General Counsel.",
+      "applies_to": ["any"],
+      "keywords": ["governing law", "jurisdiction", "applicable law", "courts of", "laws of"]
+    },
+    {
+      "id": "POS-17",
+      "topic": "Language",
+      "category": "Other Contractual",
+      "preferred": "English version prevails.",
+      "acceptable": null,
+      "escalation_to": "Senior Manager, Research Grants and Contracts.",
+      "applies_to": ["any"],
+      "keywords": ["language", "prevails", "translation", "official version"]
+    },
+    {
+      "id": "POS-18",
+      "topic": "Dispute Resolution",
+      "category": "Other Contractual",
+      "preferred": "Both parties must discuss in good faith before arbitration or litigation. Escalation to senior management followed by mediation before arbitration/litigation. All proceedings in English. Process must not prevent urgent interlocutory action through courts.",
+      "acceptable": "Cannot always alter dispute clauses for NZ and International Funding Agency contracts — escalation not required where this is the case.",
+      "escalation_to": "Senior Manager Research Grants and Contracts / General Counsel (or Designated Legal Advisor in absence).",
+      "applies_to": ["any"],
+      "keywords": ["dispute", "arbitration", "mediation", "good faith", "alternative dispute resolution", "ADR"]
+    },
+    {
+      "id": "POS-19",
+      "topic": "Termination",
+      "category": "Other Contractual",
+      "preferred": "Mutual two-way termination for material breach of contract or insolvency. Clear right of UoA to terminate for client's failure to pay. Accrued rights and benefits not affected. Client pays termination costs including any uncancellable obligations.",
+      "acceptable": "Termination for convenience acceptable ONLY for Consulting contracts, with reasonable notice, PI agreement, and client paying termination costs / uncancellable obligations. Cannot always alter termination provisions for NZ and International Funding Agency contracts (escalate to PM).",
+      "escalation_to": "Senior Manager Research Grants and Contracts.",
+      "applies_to": ["any"],
+      "keywords": ["terminate", "termination", "termination for convenience", "termination for cause", "wind down", "exit"]
+    },
+    {
+      "id": "POS-20",
+      "topic": "No Disrepute Clauses",
+      "category": "Other Contractual",
+      "preferred": "Do not accept clauses that preclude UoA academic staff or students from saying or doing anything that would bring the client into 'disrepute'.",
+      "acceptable": "Acceptable provided wording is included: 'Nothing in this Agreement will limit the rights of the University's personnel to exercise the academic freedoms enshrined in s267 of the Education and Training Act 2020 (NZ).' (Statutory academic freedoms cannot be contracted out of regardless.)",
+      "escalation_to": "Senior Manager Research Grants and Contracts.",
+      "applies_to": ["any"],
+      "keywords": ["disrepute", "non-disparagement", "non disparagement", "academic freedom", "bring into disrepute"]
+    },
+    {
+      "id": "POS-21",
+      "topic": "Variations and Extensions",
+      "category": "Other Contractual",
+      "preferred": "All variations negotiated and executed in writing prior to expiry of the current Agreement, in accordance with funder guidelines.",
+      "acceptable": "Extensions negotiated and executed in writing only if the current Agreement has itself expired. Extensions may cover changes beyond just an end date.",
+      "escalation_to": null,
+      "applies_to": ["any"],
+      "keywords": ["variation", "amendment", "extension", "extend the term", "modify this agreement", "change order"]
+    },
+    {
+      "id": "POS-IP",
+      "topic": "Intellectual Property",
+      "category": "IP (UniServices)",
+      "preferred": "IP positions are set by Auckland UniServices Ltd and are NOT contained in this protocol.",
+      "acceptable": null,
+      "escalation_to": "Auckland UniServices Ltd — Head of IP. Any IP clause must be referred regardless of wording.",
+      "applies_to": ["any"],
+      "keywords": ["intellectual property", "background ip", "foreground ip", "arising ip", "inventions", "copyright assigns", "ownership of results", "patent rights"]
+    }
+  ]
+}

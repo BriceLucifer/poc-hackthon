@@ -1,0 +1,110 @@
+{
+  "$schema_note": "v0 gold labels for MTA Example 1.pdf. Each entry's `clause_match` is a substring used to align the predicted clause to the gold (substring of the clause text, case-insensitive, first occurrence wins). Levels: green | amber | red | blue. `topic_id` references uoa_positions.json; null when topic is not covered. `notes` capture the human reasoning so the labels are auditable.",
+  "case": "MTA Example 1.pdf",
+  "labelled_by": "Claude (Opus 4.7) — v0 proposal, awaiting human review",
+  "expected_contract_type": "Material Transfer Agreement",
+  "labels": [
+    {
+      "clause_match": "will not use the Material for administration to human",
+      "expected_level": "blue",
+      "topic_id": null,
+      "notes": "Material use restriction (no human/clinical/diagnostic). UoA Positions does not cover material-use restrictions."
+    },
+    {
+      "clause_match": "may use the Material and Data solely for the purposes of the Study",
+      "expected_level": "blue",
+      "topic_id": null,
+      "notes": "Approved-purpose / scope-of-use clause. Standard MTA term, not in UoA Positions."
+    },
+    {
+      "clause_match": "use a courier with suitable skill and experience",
+      "expected_level": "blue",
+      "topic_id": null,
+      "notes": "Logistics — transport, risk passing, no charge. Not a UoA Positions topic."
+    },
+    {
+      "clause_match": "no warranties are given about quality or fitness for a particular purpose",
+      "expected_level": "amber",
+      "topic_id": "POS-10",
+      "notes": "Provider's no-warranty disclaimer. Touches Warranties; symmetric to UoA's preferred 'as is' position. Acceptable but worth confirming UoA bears no implied warranty obligation."
+    },
+    {
+      "clause_match": "ensure a level of security appropriate to the risk",
+      "expected_level": "amber",
+      "topic_id": "POS-11",
+      "notes": "Data security obligations on Recipient. Touches Confidentiality. Duration not stated — manager review."
+    },
+    {
+      "clause_match": "shall keep all of the Data secure from any unauthorised",
+      "expected_level": "blue",
+      "topic_id": null,
+      "notes": "Access controls (employees/students under supervision). Not directly a UoA Positions topic."
+    },
+    {
+      "clause_match": "the Recipient\nInstitution assumes all liability for damages",
+      "expected_level": "amber",
+      "topic_id": "POS-07",
+      "notes": "'Assumes all liability' is a deviation from POS-07 preferred (negligence-only), but cap of NZD$100,000 is well below the $500,000 preferred ceiling, so practical exposure is bounded. Borderline — escalate per Research Contract Delegations."
+    },
+    {
+      "clause_match": "shall indemnify the Providing Institution",
+      "expected_level": "red",
+      "topic_id": "POS-08",
+      "notes": "UoA indemnifies Provider 'in full' for ALL liability — broader than POS-08 acceptable scope (negligence/wilful misconduct of UoA only, with proportionate-reduction and mitigation carve-outs). Clear escalation."
+    },
+    {
+      "clause_match": "will not extend to loss of business or profit",
+      "expected_level": "green",
+      "topic_id": "POS-07",
+      "notes": "Mutual exclusion of indirect/consequential loss + loss of business/profit — exactly what POS-07 preferred requires."
+    },
+    {
+      "clause_match": "obtain the written consent of the Provider\nInstitution if there is any material change",
+      "expected_level": "blue",
+      "topic_id": null,
+      "notes": "Change-of-use consent. Operational MTA term, not a UoA Positions topic."
+    },
+    {
+      "clause_match": "aim to co-author any publications arising from this Agreement",
+      "expected_level": "green",
+      "topic_id": "POS-12",
+      "notes": "Co-authorship + acknowledgment + copy-of-publication only. No approval/veto/embargo, no stand-down — preserves PI's right to publish. Matches POS-12 preferred."
+    },
+    {
+      "clause_match": "Provider Institution undertakes that where required by Applicable Laws",
+      "expected_level": "amber",
+      "topic_id": "POS-IP",
+      "notes": "Provider retains ownership/custodian rights over Materials and Data. IP ownership clause — UoA Positions does not cover IP; refer to Auckland UniServices."
+    },
+    {
+      "clause_match": "shall keep all information relating to the Material and Data\nconfidential",
+      "expected_level": "amber",
+      "topic_id": "POS-11",
+      "notes": "Confidentiality with standard exclusions (public domain, independently developed, etc.) — exclusions match POS-11 preferred. But duration not specified in this clause; could be perpetual unless capped elsewhere → manager review."
+    },
+    {
+      "clause_match": "results generated in the course of the Study",
+      "expected_level": "amber",
+      "topic_id": "POS-IP",
+      "notes": "Joint ownership of foreground results + cross-consent for use. IP clause — refer to Auckland UniServices."
+    },
+    {
+      "clause_match": "not to attempt to identify or contact any individual",
+      "expected_level": "blue",
+      "topic_id": null,
+      "notes": "Re-identification prohibition + breach-notification. Privacy/Data-handling, not in UoA Positions."
+    },
+    {
+      "clause_match": "Provider Institution from\nbeing able to distribute the Material",
+      "expected_level": "blue",
+      "topic_id": null,
+      "notes": "Provider retains right to distribute Materials elsewhere. Not in UoA Positions."
+    },
+    {
+      "clause_match": "right to terminate this agreement forthwith at any\ntime",
+      "expected_level": "amber",
+      "topic_id": "POS-19",
+      "notes": "One-way termination by Provider for breach or ethics withdrawal. POS-19 preferred is mutual two-way termination — deviation. No payment-for-work-done addressed → escalation worthy."
+    }
+  ]
+}

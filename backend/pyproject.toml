@@ -1,0 +1,49 @@
+[project]
+name = "research-contract-adviser"
+version = "0.1.0"
+description = "Research Contract Adviser Agent — POC backend (Azure AI Foundry)"
+readme = "../README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "python-multipart>=0.0.12",
+    "pydantic>=2.9.2",
+    "pypdf>=5.0.1",
+    "pdfplumber>=0.11.4",
+    "python-docx>=1.1.2",
+    "httpx>=0.27.2",
+    "python-dotenv>=1.0.1",
+]
+
+[project.optional-dependencies]
+# Azure AI Foundry — install with: uv sync --extra azure-openai
+azure-openai = [
+    "openai>=1.54.0",
+]
+# Foundry MaaS / serverless (Llama, Mistral, Phi, …)
+foundry-maas = [
+    "azure-ai-inference>=1.0.0b6",
+]
+# AAD / Entra auth instead of API keys
+azure-identity = [
+    "azure-identity>=1.19.0",
+]
+
+[project.scripts]
+serve = "main:run"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+only-include = [
+    "main.py",
+    "agent.py",
+    "api_clients.py",
+    "models.py",
+    "services",
+    "data",
+]

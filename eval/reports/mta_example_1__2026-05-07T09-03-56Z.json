@@ -1,0 +1,195 @@
+{
+  "case": "MTA Example 1.pdf",
+  "ran_at": "2026-05-07T09:03:56.036699+00:00",
+  "contract_type_predicted": "Material Transfer Agreement",
+  "contract_type_expected": "Material Transfer Agreement",
+  "contract_type_correct": true,
+  "n_clauses": 17,
+  "n_matched": 16,
+  "n_unmatched": 1,
+  "exact_match_accuracy": 0.8125,
+  "macro_f1": 0.7333,
+  "severity_off_by_one": 2,
+  "per_level": {
+    "green": {
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
+      "support": 2
+    },
+    "amber": {
+      "precision": 0.8,
+      "recall": 0.5714,
+      "f1": 0.6667,
+      "support": 7
+    },
+    "red": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667,
+      "support": 1
+    },
+    "blue": {
+      "precision": 0.875,
+      "recall": 1.0,
+      "f1": 0.9333,
+      "support": 7
+    }
+  },
+  "confusion": {
+    "blue": {
+      "blue": 7
+    },
+    "amber": {
+      "amber": 4,
+      "red": 1,
+      "blue": 1
+    },
+    "red": {
+      "red": 1
+    },
+    "green": {
+      "amber": 1,
+      "green": 1
+    }
+  },
+  "rows": [
+    {
+      "gold_level": "blue",
+      "pred_level": "blue",
+      "topic_id": null,
+      "clause_match": "will not use the Material for administration to human",
+      "ok": true
+    },
+    {
+      "gold_level": "blue",
+      "pred_level": "blue",
+      "topic_id": null,
+      "clause_match": "may use the Material and Data solely for the purposes of the Study",
+      "ok": true
+    },
+    {
+      "gold_level": "blue",
+      "pred_level": "blue",
+      "topic_id": null,
+      "clause_match": "use a courier with suitable skill and experience",
+      "ok": true
+    },
+    {
+      "gold_level": "amber",
+      "pred_level": null,
+      "topic_id": "POS-10",
+      "clause_match": "no warranties are given about quality or fitness for a particular purpose",
+      "ok": false
+    },
+    {
+      "gold_level": "amber",
+      "pred_level": "amber",
+      "topic_id": "POS-11",
+      "clause_match": "ensure a level of security appropriate to the risk",
+      "ok": true
+    },
+    {
+      "gold_level": "blue",
+      "pred_level": "blue",
+      "topic_id": null,
+      "clause_match": "shall keep all of the Data secure from any unauthorised",
+      "ok": true
+    },
+    {
+      "gold_level": "amber",
+      "pred_level": "red",
+      "topic_id": "POS-07",
+      "clause_match": "the Recipient\nInstitution assumes all liability for damages",
+      "ok": false
+    },
+    {
+      "gold_level": "red",
+      "pred_level": "red",
+      "topic_id": "POS-08",
+      "clause_match": "shall indemnify the Providing Institution",
+      "ok": true
+    },
+    {
+      "gold_level": "green",
+      "pred_level": "amber",
+      "topic_id": "POS-07",
+      "clause_match": "will not extend to loss of business or profit",
+      "ok": false
+    },
+    {
+      "gold_level": "blue",
+      "pred_level": "blue",
+      "topic_id": null,
+      "clause_match": "obtain the written consent of the Provider\nInstitution if there is any material ",
+      "ok": true
+    },
+    {
+      "gold_level": "green",
+      "pred_level": "green",
+      "topic_id": "POS-12",
+      "clause_match": "aim to co-author any publications arising from this Agreement",
+      "ok": true
+    },
+    {
+      "gold_level": "amber",
+      "pred_level": "blue",
+      "topic_id": "POS-IP",
+      "clause_match": "Provider Institution undertakes that where required by Applicable Laws",
+      "ok": false
+    },
+    {
+      "gold_level": "amber",
+      "pred_level": "amber",
+      "topic_id": "POS-11",
+      "clause_match": "shall keep all information relating to the Material and Data\nconfidential",
+      "ok": true
+    },
+    {
+      "gold_level": "amber",
+      "pred_level": "amber",
+      "topic_id": "POS-IP",
+      "clause_match": "results generated in the course of the Study",
+      "ok": true
+    },
+    {
+      "gold_level": "blue",
+      "pred_level": "blue",
+      "topic_id": null,
+      "clause_match": "not to attempt to identify or contact any individual",
+      "ok": true
+    },
+    {
+      "gold_level": "blue",
+      "pred_level": "blue",
+      "topic_id": null,
+      "clause_match": "Provider Institution from\nbeing able to distribute the Material",
+      "ok": true
+    },
+    {
+      "gold_level": "amber",
+      "pred_level": "amber",
+      "topic_id": "POS-19",
+      "clause_match": "right to terminate this agreement forthwith at any\ntime",
+      "ok": true
+    }
+  ],
+  "metrics": {
+    "n_calls": 3,
+    "input_tokens": 16575,
+    "output_tokens": 2582,
+    "total_tokens": 19157,
+    "latency_ms": 38884.4,
+    "total_cost_usd": 0.067257,
+    "backend": "azure-openai",
+    "model": "gpt-4o",
+    "wall_ms": 39007.1
+  },
+  "predicted_counts": {
+    "green": 1,
+    "amber": 6,
+    "red": 2,
+    "blue": 8
+  },
+  "summary": "The review of \"MTA Example 1.pdf\" reveals a moderate to high-risk posture due to several flagged clauses, including two red-level issues related to unlimited liability and uncapped indemnities, which conflict with UoA Positions #POS-07 and #POS-08. Amber-level concerns around confidentiality, intellectual property, and termination rights require further clarification to ensure alignment with UoA policies. Immediate escalation to Research Grants and Contracts Delegations is recommended to address the red-level issues, alongside consultations with relevant stakeholders to resolve amber-level concerns."
+}
