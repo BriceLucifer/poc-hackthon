@@ -230,7 +230,7 @@ export default function App() {
             )}
 
             {activeSession?.review && (
-              <ReviewWorkbench review={activeSession.review} />
+              <ReviewWorkbench key={activeSession.id} review={activeSession.review} />
             )}
           </div>
         </main>

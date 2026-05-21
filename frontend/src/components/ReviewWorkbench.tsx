@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -25,7 +25,7 @@ export function ReviewWorkbench({ review }: Props) {
 
   useEffect(() => {
     setActiveLevel(preferredLevel(review));
-  }, [review.document_id]);
+  }, [review.document_id, review.generated_at]);
 
   const activeItems = review.flags.filter((flag) => flag.level === activeLevel);
 
@@ -57,17 +57,14 @@ export function ReviewWorkbench({ review }: Props) {
         </div>
       </section>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeLevel}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <FlagSection level={activeLevel} items={activeItems} />
-        </motion.div>
-      </AnimatePresence>
+      <motion.div
+        key={`${review.document_id}-${review.generated_at}-${activeLevel}`}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <FlagSection level={activeLevel} items={activeItems} />
+      </motion.div>
     </div>
   );
 }
