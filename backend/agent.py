@@ -14,8 +14,13 @@ or wire in your provider when ready.
 from __future__ import annotations
 
 import json
+import os
+import re
+import time
 import uuid
 from dataclasses import dataclass, field
+from hashlib import sha256
+from pathlib import Path
 
 from api_clients import CallRecord, call_llm, is_configured, track_usage
 from models import (
@@ -40,10 +45,31 @@ class StoredDocument:
     text: str
     clauses: list[Clause] = field(default_factory=list)
     ingest_calls: list[CallRecord] = field(default_factory=list)
+    classification: "ClassificationResult | None" = None
+    classification_calls: list[CallRecord] = field(default_factory=list)
+    review_cache: ContractReview | None = None
+
+
+@dataclass
+class ClassificationResult:
+    contract_type: ContractType
+    confidence: float
+    rationale: str
 
 
 # Tiny in-memory store. Swap for Redis / DB before any real deployment.
 _store: dict[str, StoredDocument] = {}
+_parse_cache: dict[str, tuple[str, list[Clause]]] = {}
+
+CLASSIFY_LLM_MODE = os.getenv("CLASSIFY_LLM", "auto").lower()
+CLASSIFY_LLM_MIN_CONFIDENCE = float(os.getenv("CLASSIFY_LLM_MIN_CONFIDENCE", "0.88"))
+MAX_REVIEW_CLAUSE_CHARS = int(os.getenv("MAX_REVIEW_CLAUSE_CHARS", "1800"))
+MAX_REVIEW_TOTAL_CHARS = int(os.getenv("MAX_REVIEW_TOTAL_CHARS", "42000"))
+MIN_CONTRACT_TEXT_CHARS = int(os.getenv("MIN_CONTRACT_TEXT_CHARS", "200"))
+EXTRACTION_CACHE = os.getenv("EXTRACTION_CACHE", "on").lower()
+EXTRACTION_CACHE_DIR = Path(
+    os.getenv("EXTRACTION_CACHE_DIR", "/private/tmp/research-contract-adviser-cache")
+)
 
 
 def get_document(document_id: str) -> StoredDocument | None:
@@ -51,20 +77,85 @@ def get_document(document_id: str) -> StoredDocument | None:
 
 
 async def ingest(filename: str, raw: bytes) -> StoredDocument:
-    """Ingest a file. Uses GPT-4o vision OCR for every PDF page (kills both
-    scanned-page blackouts and multi-column interleaving)."""
-    with track_usage() as ingest_usage:
-        text = await extract_text_async(filename, raw)
-    clauses = split_clauses(text)
+    """Ingest a file, using cached extraction for repeated sample/demo runs."""
+    digest = sha256(raw).hexdigest()
+    suffix = Path(filename).suffix.lower()
+    cache_key = f"{suffix}:{digest}"
+    cached = _parse_cache.get(cache_key)
+    if cached is None:
+        disk_cached = _read_extraction_cache(digest)
+        if disk_cached is None:
+            with track_usage() as ingest_usage:
+                text = await extract_text_async(filename, raw)
+            clauses = split_clauses(text)
+            _validate_extracted_contract(text, clauses)
+            _parse_cache[cache_key] = (text, clauses)
+            _write_extraction_cache(digest, filename, text, clauses)
+            ingest_calls = list(ingest_usage.calls)
+        else:
+            text, clauses = disk_cached
+            _parse_cache[cache_key] = (text, clauses)
+            ingest_calls = []
+    else:
+        text, clauses = cached
+        ingest_calls = []
     doc = StoredDocument(
         document_id=uuid.uuid4().hex,
         filename=filename,
         text=text,
         clauses=clauses,
-        ingest_calls=list(ingest_usage.calls),
+        ingest_calls=ingest_calls,
     )
     _store[doc.document_id] = doc
     return doc
+
+
+def _validate_extracted_contract(text: str, clauses: list[Clause]) -> None:
+    if len(text.strip()) >= MIN_CONTRACT_TEXT_CHARS and clauses:
+        return
+    raise ValueError(
+        "No usable contract text could be extracted from this file "
+        f"({len(text.strip())} characters, {len(clauses)} clauses). "
+        "If this is a scanned PDF, fix the GPT-4o deployment settings "
+        "or upload a text-layer PDF/DOCX."
+    )
+
+
+def _read_extraction_cache(digest: str) -> tuple[str, list[Clause]] | None:
+    if EXTRACTION_CACHE == "off":
+        return None
+    path = EXTRACTION_CACHE_DIR / f"{digest}.json"
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        text = str(data["text"])
+        clauses = [Clause(**item) for item in data["clauses"]]
+        _validate_extracted_contract(text, clauses)
+        return text, clauses
+    except Exception:
+        return None
+
+
+def _write_extraction_cache(
+    digest: str,
+    filename: str,
+    text: str,
+    clauses: list[Clause],
+) -> None:
+    if EXTRACTION_CACHE == "off":
+        return
+    try:
+        EXTRACTION_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        path = EXTRACTION_CACHE_DIR / f"{digest}.json"
+        payload = {
+            "filename": filename,
+            "text": text,
+            "clauses": [clause.model_dump(mode="json") for clause in clauses],
+        }
+        path.write_text(json.dumps(payload), encoding="utf-8")
+    except Exception:
+        pass
 
 
 # --------------------------------------------------------------------------
@@ -73,10 +164,31 @@ async def ingest(filename: str, raw: bytes) -> StoredDocument:
 
 async def classify(doc: StoredDocument) -> tuple[ContractType, float, str]:
     """Return (contract_type, confidence, rationale)."""
+    if doc.classification is not None:
+        c = doc.classification
+        return c.contract_type, c.confidence, c.rationale
+
+    with track_usage() as usage:
+        result = await _classify_uncached(doc)
+    doc.classification = result
+    doc.classification_calls = list(usage.calls)
+    return result.contract_type, result.confidence, result.rationale
+
+
+async def _classify_uncached(doc: StoredDocument) -> ClassificationResult:
     base_type, base_conf, base_reason = classify_by_keywords(doc.text)
 
-    if not is_configured():
-        return base_type, base_conf, base_reason
+    should_refine = (
+        is_configured()
+        and CLASSIFY_LLM_MODE != "off"
+        and (
+            CLASSIFY_LLM_MODE == "always"
+            or base_type == ContractType.UNKNOWN
+            or base_conf < CLASSIFY_LLM_MIN_CONFIDENCE
+        )
+    )
+    if not should_refine:
+        return ClassificationResult(base_type, base_conf, base_reason)
 
     valid = ", ".join(t.value for t in ContractType if t != ContractType.UNKNOWN)
     system = (
@@ -91,15 +203,18 @@ async def classify(doc: StoredDocument) -> tuple[ContractType, float, str]:
         f"(confidence {base_conf}, {base_reason}).\n\n"
         f"Document excerpt:\n---\n{doc.text[:6000]}\n---\n"
     )
-    raw = await call_llm(system, user, json_mode=True, label="classify")
+    try:
+        raw = await call_llm(system, user, json_mode=True, label="classify")
+    except Exception:
+        return ClassificationResult(base_type, base_conf, base_reason)
     try:
         data = json.loads(raw)
         ct = ContractType(data["contract_type"])
         conf = float(data.get("confidence", base_conf))
         rationale = str(data.get("rationale", base_reason))
-        return ct, max(0.0, min(1.0, conf)), rationale
+        return ClassificationResult(ct, max(0.0, min(1.0, conf)), rationale)
     except (json.JSONDecodeError, KeyError, ValueError):
-        return base_type, base_conf, base_reason
+        return ClassificationResult(base_type, base_conf, base_reason)
 
 
 # --------------------------------------------------------------------------
@@ -107,24 +222,32 @@ async def classify(doc: StoredDocument) -> tuple[ContractType, float, str]:
 # --------------------------------------------------------------------------
 
 async def review(doc: StoredDocument) -> ContractReview:
+    if doc.review_cache is not None:
+        return doc.review_cache
+
+    started = time.perf_counter()
+    contract_type, confidence, _ = await classify(doc)
+    flags = compare_clauses(doc.clauses, contract_type)
+    summary: str | None = None
+
     with track_usage() as usage:
-        contract_type, confidence, _ = await classify(doc)
-        flags = compare_clauses(doc.clauses, contract_type)
-
         if is_configured():
-            flags = await _augment_flags_with_llm(doc, contract_type, flags)
+            flags, summary = await _augment_flags_with_llm(doc, contract_type, flags)
 
-        summary = await _llm_summary(doc, contract_type, flags) if is_configured() else None
-        report = build_report(
-            document_id=doc.document_id,
-            filename=doc.filename,
-            contract_type=contract_type,
-            confidence=confidence,
-            flags=flags,
-            summary=summary,
-        )
+    report = build_report(
+        document_id=doc.document_id,
+        filename=doc.filename,
+        contract_type=contract_type,
+        confidence=confidence,
+        flags=flags,
+        summary=summary,
+    )
 
-    all_calls = list(doc.ingest_calls) + list(usage.calls)
+    all_calls = (
+        list(doc.ingest_calls)
+        + list(doc.classification_calls)
+        + list(usage.calls)
+    )
     sample_call = all_calls[0] if all_calls else None
     report.metrics = ReviewMetrics(
         n_calls=len(all_calls),
@@ -140,6 +263,9 @@ async def review(doc: StoredDocument) -> ContractReview:
         ["UoA Preferred Contracting Positions (Sept 2025 draft)"]
         + [f"UoA Template — {f}" for f in template_filenames_for(contract_type)]
     )
+    if not report.metrics.latency_ms and not report.metrics.n_calls:
+        report.metrics.latency_ms = round((time.perf_counter() - started) * 1000, 1)
+    doc.review_cache = report
     return report
 
 
@@ -147,7 +273,7 @@ async def _augment_flags_with_llm(
     doc: StoredDocument,
     contract_type: ContractType,
     seed_flags: list[FlagItem],
-) -> list[FlagItem]:
+) -> tuple[list[FlagItem], str | None]:
     """Ask the LLM to refine / extend the deterministic flags.
 
     Strategy: send the LLM the seed flags + UoA positions + clauses, ask it
@@ -163,12 +289,12 @@ async def _augment_flags_with_llm(
 
     system = (
         "You are an expert research-contracts reviewer for the University of Auckland (UoA). "
-        "You will be given THREE inputs:\n"
+        "You will be given FOUR inputs:\n"
         "  1. UoA Preferred Contracting Positions — the cross-type policy (rules).\n"
         "  2. The UoA Standard Template for this contract type — the canonical "
         "wording UoA itself would draft. (Absent for some types.)\n"
-        "  3. The clauses extracted from the contract under review, plus candidate "
-        "flags from a deterministic comparator.\n\n"
+        "  3. The full extracted clauses from the contract under review.\n"
+        "  4. Candidate flags from a deterministic comparator.\n\n"
         "Refine the flag list. The flag system maps to the Positions tiers:\n"
         "  • Clause matches Preferred / matches the UoA Template       → green\n"
         "  • Clause matches Acceptable tier (deviation pre-approved)   → amber\n"
@@ -187,7 +313,8 @@ async def _augment_flags_with_llm(
         "background/foreground IP, patent rights) is AMBER and the rationale must "
         "refer the reader to Auckland UniServices — UoA Positions does not own IP.\n\n"
         "Return strict JSON: "
-        '{"flags": [{"level":"green|amber|red|blue","clause_id":"..","clause_title":"..",'
+        '{"summary":"2-3 sentence executive summary","flags": '
+        '[{"level":"green|amber|red|blue","clause_id":"..","clause_title":"..",'
         '"snippet":"..","rationale":"..","standard_ref":"UoA Position #... or UoA Template"}]}. '
         "Rationale should name the topic, name which UoA reference (Position id or "
         "the template) it ties to, state which tier the clause matches, and (for red) "
@@ -197,7 +324,7 @@ async def _augment_flags_with_llm(
     user_parts = [f"Contract type: {contract_type.value}\n"]
     user_parts.append(
         "## UoA Preferred Contracting Positions (only those applicable to this type)\n"
-        + json.dumps(relevant_positions, indent=2)
+        + json.dumps(relevant_positions, separators=(",", ":"))
     )
     if has_template:
         user_parts.append(
@@ -211,11 +338,18 @@ async def _augment_flags_with_llm(
             "Positions document only.)"
         )
     user_parts.append(
+        "## Extracted contract clauses\n"
+        + json.dumps(_clause_payload(doc.clauses), separators=(",", ":"))
+    )
+    user_parts.append(
         "## Candidate flags from the deterministic comparator (refine as needed)\n"
-        + json.dumps([f.model_dump() for f in seed_flags], indent=2)
+        + json.dumps([f.model_dump(mode="json") for f in seed_flags], separators=(",", ":"))
     )
     user = "\n\n".join(user_parts)
-    raw = await call_llm(system, user, json_mode=True, max_tokens=4096, label="augment_flags")
+    try:
+        raw = await call_llm(system, user, json_mode=True, max_tokens=4096, label="review")
+    except Exception:
+        return seed_flags, None
     try:
         data = json.loads(raw)
         refined: list[FlagItem] = []
@@ -228,9 +362,30 @@ async def _augment_flags_with_llm(
                 rationale=str(item.get("rationale", "")),
                 standard_ref=item.get("standard_ref"),
             ))
-        return refined or seed_flags
+        summary = str(data.get("summary", "")).strip() or None
+        return refined or seed_flags, summary
     except (json.JSONDecodeError, KeyError, ValueError):
-        return seed_flags
+        return seed_flags, None
+
+
+def _clause_payload(clauses: list[Clause]) -> list[dict[str, str]]:
+    payload: list[dict[str, str]] = []
+    used = 0
+    for clause in clauses:
+        raw = re.sub(r"\s+", " ", clause.text).strip()
+        text = raw[:MAX_REVIEW_CLAUSE_CHARS]
+        if len(raw) > MAX_REVIEW_CLAUSE_CHARS:
+            text += " [...truncated...]"
+        projected = used + len(text)
+        if projected > MAX_REVIEW_TOTAL_CHARS and payload:
+            break
+        used = projected
+        payload.append({
+            "id": clause.id,
+            "title": clause.title,
+            "text": text,
+        })
+    return payload
 
 
 async def _llm_summary(
@@ -272,7 +427,8 @@ async def chat(
         )
     if not is_configured():
         return (
-            "[mock chat] No LLM provider configured. Set ANTHROPIC_API_KEY in "
+            "[mock chat] No LLM provider configured. Set AZURE_OPENAI_ENDPOINT, "
+            "AZURE_OPENAI_API_KEY and AZURE_OPENAI_CHAT_DEPLOYMENT in "
             "backend/.env to enable real conversation."
             + context
         )

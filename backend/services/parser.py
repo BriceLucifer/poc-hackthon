@@ -35,7 +35,7 @@ def extract_text(filename: str, raw: bytes) -> str:
         return "\n".join(pages)
     if ext == ".docx":
         document = docx.Document(io.BytesIO(raw))
-        return "\n".join(p.text for p in document.paragraphs if p.text)
+        return _extract_docx_text(document)
     if ext in {".txt", ".md"}:
         return raw.decode("utf-8", errors="ignore")
     raise ValueError(f"Unsupported file type: {ext}")
@@ -151,3 +151,29 @@ def _slice_by_matches(text, matches, *, id_from_match, title_from_match=None) ->
 def _first_line(s: str, limit: int = 80) -> str:
     line = s.strip().split("\n", 1)[0]
     return line[:limit]
+
+
+def _extract_docx_text(document: docx.Document) -> str:
+    blocks: list[str] = []
+    seen: set[str] = set()
+
+    for paragraph in document.paragraphs:
+        text = paragraph.text.strip()
+        if text:
+            blocks.append(text)
+
+    for table in document.tables:
+        for row in table.rows:
+            cells = []
+            for cell in row.cells:
+                text = " ".join(p.text.strip() for p in cell.paragraphs if p.text.strip())
+                if text:
+                    cells.append(text)
+            if cells:
+                line = " | ".join(cells)
+                # python-docx repeats merged cell text; collapse exact duplicates.
+                if line not in seen:
+                    seen.add(line)
+                    blocks.append(line)
+
+    return "\n".join(blocks)

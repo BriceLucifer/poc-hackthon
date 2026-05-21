@@ -4,19 +4,19 @@ import { Hero } from "./components/Hero";
 import { UploadCard } from "./components/UploadCard";
 import { SamplePicker } from "./components/SamplePicker";
 import { ContractTypeBadge } from "./components/ContractTypeBadge";
-import { SummaryCard } from "./components/SummaryCard";
-import { FlagSection } from "./components/FlagSection";
 import { EvalScorecard } from "./components/EvalScorecard";
 import { ChatDock } from "./components/ChatDock";
 import { Footer } from "./components/Footer";
+import { PipelineStatus } from "./components/PipelineStatus";
+import { ReviewWorkbench } from "./components/ReviewWorkbench";
 import { api, type ClassifyResponse, type ContractReview } from "./lib/api";
-import { FLAG_ORDER } from "./lib/flags";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Phase = "idle" | "uploading" | "classifying" | "reviewing" | "done" | "error";
 
 export default function App() {
   const [llmReady, setLlmReady] = useState(false);
+  const [llmStatus, setLlmStatus] = useState("Checking model connection...");
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +26,15 @@ export default function App() {
   const [review, setReview] = useState<ContractReview | null>(null);
 
   useEffect(() => {
-    api.health().then((h) => setLlmReady(h.llm_configured)).catch(() => {});
+    api.health()
+      .then((h) => {
+        setLlmReady(h.llm_configured);
+        setLlmStatus(h.llm_status);
+      })
+      .catch(() => {
+        setLlmReady(false);
+        setLlmStatus("Backend health check failed.");
+      });
   }, []);
 
   async function runPipeline(file: File) {
@@ -88,7 +96,7 @@ export default function App() {
 
   return (
     <div className="app-bg min-h-full">
-      <Header llmReady={llmReady} />
+      <Header llmReady={llmReady} llmStatus={llmStatus} />
 
       <main className="mx-auto max-w-6xl px-6 pb-24">
         <Hero />
@@ -109,23 +117,7 @@ export default function App() {
 
           <AnimatePresence>
             {busy && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3 }}
-                className="glass rounded-2xl p-4 flex items-center gap-3"
-              >
-                <div className="relative size-5">
-                  <div className="absolute inset-0 rounded-full border-2 border-ink-200" />
-                  <div className="absolute inset-0 rounded-full border-2 border-flag-blue border-t-transparent animate-spin" />
-                </div>
-                <div className="text-[13.5px] text-ink-700">
-                  {phase === "uploading" && "Uploading and parsing the document…"}
-                  {phase === "classifying" && "Identifying contract type…"}
-                  {phase === "reviewing" && "Comparing clauses against UoA standard positions…"}
-                </div>
-              </motion.div>
+              <PipelineStatus phase={phase} filename={filename} />
             )}
           </AnimatePresence>
 
@@ -149,18 +141,7 @@ export default function App() {
           )}
 
           {review && (
-            <>
-              <SummaryCard review={review} />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {FLAG_ORDER.map((lvl) => (
-                  <FlagSection
-                    key={lvl}
-                    level={lvl}
-                    items={review.flags.filter((f) => f.level === lvl)}
-                  />
-                ))}
-              </div>
-            </>
+            <ReviewWorkbench review={review} />
           )}
         </div>
       </main>

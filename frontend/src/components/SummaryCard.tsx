@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Download, BookMarked } from "lucide-react";
+import { Download, BookMarked, AlertTriangle, CheckCircle2, CircleAlert, HelpCircle } from "lucide-react";
 import type { ContractReview, FlagLevel } from "../lib/api";
 import { FLAG_META, FLAG_ORDER } from "../lib/flags";
 import { MetricsStrip } from "./MetricsStrip";
@@ -69,6 +69,8 @@ export function SummaryCard({ review }: Props) {
 
       <div className="divider my-6" />
 
+      <RiskBar review={review} />
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {FLAG_ORDER.map((lvl) => (
           <CountTile
@@ -82,12 +84,46 @@ export function SummaryCard({ review }: Props) {
   );
 }
 
+function RiskBar({ review }: { review: ContractReview }) {
+  const total = Math.max(1, review.flags.length);
+  return (
+    <div className="mb-5">
+      <div className="mb-2 flex items-center justify-between text-[12px] text-ink-500">
+        <span>Risk distribution</span>
+        <span>{review.flags.length} reviewed clauses</span>
+      </div>
+      <div className="flex h-2 overflow-hidden rounded-full bg-ink-100">
+        {FLAG_ORDER.map((lvl) => {
+          const count = review.counts[lvl] ?? 0;
+          if (!count) return null;
+          return (
+            <div
+              key={lvl}
+              className={FLAG_META[lvl].dot}
+              style={{ width: `${(count / total) * 100}%` }}
+              title={`${FLAG_META[lvl].label}: ${count}`}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function CountTile({ level, count }: { level: FlagLevel; count: number }) {
   const meta = FLAG_META[level];
+  const Icon =
+    level === "red"
+      ? AlertTriangle
+      : level === "amber"
+        ? CircleAlert
+        : level === "green"
+          ? CheckCircle2
+          : HelpCircle;
   return (
-    <div className="rounded-2xl bg-white/70 border border-white/70 p-4 hover:bg-white transition">
-      <div className="flex items-center gap-2">
-        <span className={`size-2 rounded-full ${meta.dot}`} />
+    <div className="rounded-lg bg-white/70 border border-white/70 p-4 hover:bg-white transition">
+      <div className="flex items-center gap-2 min-w-0">
+        <Icon className={`size-4 shrink-0 ${meta.color}`} />
         <span className="text-[12px] font-medium text-ink-700">{meta.label}</span>
       </div>
       <div className="mt-2 flex items-baseline gap-1.5">

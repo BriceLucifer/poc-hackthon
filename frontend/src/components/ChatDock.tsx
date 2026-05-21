@@ -56,7 +56,7 @@ export function ChatDock({ documentId }: Props) {
     <>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-40 size-12 rounded-full bg-gradient-to-br from-flag-blue to-[#5e5ce6] text-white grid place-items-center shadow-glass hover:scale-105 active:scale-95 transition"
+        className="fixed bottom-6 right-6 z-40 size-12 rounded-full bg-gradient-to-br from-flag-blue to-[#34c759] text-white grid place-items-center shadow-glass hover:scale-105 active:scale-95 transition"
         aria-label="Open chat"
       >
         <MessageCircle className="size-5" />

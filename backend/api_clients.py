@@ -26,6 +26,7 @@ import os
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Iterator, Literal
 
 # ---------- Configuration ---------------------------------------------------
@@ -118,6 +119,11 @@ class Usage:
 _current_usage: contextvars.ContextVar[Usage | None] = contextvars.ContextVar(
     "current_usage", default=None
 )
+_llm_probe_cache: dict[str, object] = {
+    "checked_at": 0.0,
+    "ready": False,
+    "status": "not checked",
+}
 
 
 @contextmanager
@@ -154,6 +160,117 @@ def _resolve_backend() -> str:
     if FOUNDRY_ENDPOINT and FOUNDRY_API_KEY:
         return "foundry-maas"
     return "mock"
+
+
+async def check_llm_ready(*, ttl_seconds: float = 60.0) -> tuple[bool, str]:
+    """Validate that the configured model endpoint can accept a tiny request."""
+    now = time.monotonic()
+    if now - float(_llm_probe_cache["checked_at"]) < ttl_seconds:
+        return bool(_llm_probe_cache["ready"]), str(_llm_probe_cache["status"])
+
+    backend = _resolve_backend()
+    if backend == "mock":
+        return _set_probe(False, "No Azure OpenAI or Foundry MaaS backend configured.")
+
+    try:
+        if backend == "azure-openai":
+            ready, status = await _probe_azure_openai()
+        elif backend == "foundry-maas":
+            ready, status = await _probe_foundry_maas()
+        else:
+            ready, status = False, "No LLM backend configured."
+    except Exception as e:  # noqa: BLE001 - health endpoint should not crash
+        ready, status = False, f"{type(e).__name__}: {e}"
+    return _set_probe(ready, status)
+
+
+def _set_probe(ready: bool, status: str) -> tuple[bool, str]:
+    _llm_probe_cache.update({
+        "checked_at": time.monotonic(),
+        "ready": ready,
+        "status": status,
+    })
+    return ready, status
+
+
+async def _probe_azure_openai() -> tuple[bool, str]:
+    import httpx
+
+    url = (
+        f"{AZURE_OPENAI_ENDPOINT.rstrip('/')}/openai/deployments/"
+        f"{AZURE_OPENAI_CHAT_DEPLOYMENT}/chat/completions"
+        f"?api-version={AZURE_OPENAI_API_VERSION}"
+    )
+    payload = {
+        "messages": [
+            {"role": "system", "content": "Reply with ok."},
+            {"role": "user", "content": "ok"},
+        ],
+        "temperature": 0,
+        "max_tokens": 1,
+    }
+    async with httpx.AsyncClient(timeout=8) as client:
+        resp = await client.post(
+            url,
+            headers={"api-key": AZURE_OPENAI_API_KEY},
+            json=payload,
+        )
+
+    if resp.status_code < 400:
+        return True, f"Azure OpenAI deployment '{AZURE_OPENAI_CHAT_DEPLOYMENT}' is ready."
+    if resp.status_code == 404:
+        return (
+            False,
+            f"Azure OpenAI deployment '{AZURE_OPENAI_CHAT_DEPLOYMENT}' was not found. "
+            "Check AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_CHAT_DEPLOYMENT.",
+        )
+    if resp.status_code in {401, 403}:
+        return False, "Azure OpenAI authentication failed. Check AZURE_OPENAI_API_KEY."
+    return False, f"Azure OpenAI probe failed with HTTP {resp.status_code}: {resp.text[:180]}"
+
+
+async def _probe_foundry_maas() -> tuple[bool, str]:
+    import httpx
+
+    url = FOUNDRY_ENDPOINT.rstrip("/") + "/v1/chat/completions"
+    payload = {
+        "model": FOUNDRY_MODEL or "default",
+        "messages": [{"role": "user", "content": "ok"}],
+        "temperature": 0,
+        "max_tokens": 1,
+    }
+    async with httpx.AsyncClient(timeout=8) as client:
+        resp = await client.post(
+            url,
+            headers={"Authorization": f"Bearer {FOUNDRY_API_KEY}"},
+            json=payload,
+        )
+    if resp.status_code < 400:
+        return True, "Foundry MaaS endpoint is ready."
+    if resp.status_code in {401, 403}:
+        return False, "Foundry MaaS authentication failed. Check FOUNDRY_API_KEY."
+    return False, f"Foundry MaaS probe failed with HTTP {resp.status_code}: {resp.text[:180]}"
+
+
+@lru_cache(maxsize=1)
+def _azure_chat_client():
+    from openai import AsyncAzureOpenAI
+
+    return AsyncAzureOpenAI(
+        azure_endpoint=AZURE_OPENAI_ENDPOINT,
+        api_key=AZURE_OPENAI_API_KEY,
+        api_version=AZURE_OPENAI_API_VERSION,
+    )
+
+
+@lru_cache(maxsize=1)
+def _foundry_client():
+    from openai import AsyncOpenAI
+
+    return AsyncOpenAI(
+        base_url=FOUNDRY_ENDPOINT.rstrip("/") + "/v1",
+        api_key=FOUNDRY_API_KEY,
+    )
 
 
 # ---------- Public API ------------------------------------------------------
@@ -218,13 +335,7 @@ async def call_llm(
     model = ""
 
     if backend == "azure-openai":
-        from openai import AsyncAzureOpenAI
-
-        client = AsyncAzureOpenAI(
-            azure_endpoint=AZURE_OPENAI_ENDPOINT,
-            api_key=AZURE_OPENAI_API_KEY,
-            api_version=AZURE_OPENAI_API_VERSION,
-        )
+        client = _azure_chat_client()
         kwargs: dict = {
             "model": AZURE_OPENAI_CHAT_DEPLOYMENT,
             "messages": [
@@ -244,12 +355,7 @@ async def call_llm(
         model = AZURE_OPENAI_CHAT_DEPLOYMENT
 
     elif backend == "foundry-maas":
-        from openai import AsyncOpenAI
-
-        client = AsyncOpenAI(
-            base_url=FOUNDRY_ENDPOINT.rstrip("/") + "/v1",
-            api_key=FOUNDRY_API_KEY,
-        )
+        client = _foundry_client()
         kwargs = {
             "model": FOUNDRY_MODEL or "default",
             "messages": [
@@ -300,16 +406,11 @@ async def call_vision_ocr(
         return ""
 
     import base64
-    from openai import AsyncAzureOpenAI
-
     started = time.perf_counter()
     b64 = base64.b64encode(image_bytes).decode("ascii")
+    mime_type = "image/jpeg" if image_bytes.startswith(b"\xff\xd8\xff") else "image/png"
 
-    client = AsyncAzureOpenAI(
-        azure_endpoint=AZURE_OPENAI_ENDPOINT,
-        api_key=AZURE_OPENAI_API_KEY,
-        api_version=AZURE_OPENAI_API_VERSION,
-    )
+    client = _azure_chat_client()
     resp = await client.chat.completions.create(
         model=AZURE_OPENAI_CHAT_DEPLOYMENT,
         max_tokens=4096,
@@ -334,7 +435,7 @@ async def call_vision_ocr(
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:image/png;base64,{b64}",
+                            "url": f"data:{mime_type};base64,{b64}",
                             "detail": detail,
                         },
                     },
@@ -382,13 +483,7 @@ async def embed(texts: list[str]) -> list[list[float]]:
     if _resolve_backend() == "mock" or not AZURE_OPENAI_EMBED_DEPLOYMENT:
         return [[float((sum(map(ord, t)) % 997) / 997.0)] * 8 for t in texts]
 
-    from openai import AsyncAzureOpenAI
-
-    client = AsyncAzureOpenAI(
-        azure_endpoint=AZURE_OPENAI_ENDPOINT,
-        api_key=AZURE_OPENAI_API_KEY,
-        api_version=AZURE_OPENAI_API_VERSION,
-    )
+    client = _azure_chat_client()
     resp = await client.embeddings.create(
         model=AZURE_OPENAI_EMBED_DEPLOYMENT,
         input=texts,

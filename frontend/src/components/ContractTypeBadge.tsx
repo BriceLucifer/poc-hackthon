@@ -45,7 +45,7 @@ export function ContractTypeBadge({ type, confidence, rationale }: Props) {
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="h-full bg-gradient-to-r from-flag-blue to-[#5e5ce6]"
+            className="h-full bg-gradient-to-r from-flag-blue to-[#34c759]"
           />
         </div>
       </div>

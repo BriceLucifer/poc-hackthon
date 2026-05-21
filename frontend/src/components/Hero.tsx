@@ -16,7 +16,7 @@ export function Hero() {
 
         <h1 className="mt-5 font-display text-[44px] leading-[1.05] tracking-[-0.02em] font-semibold sm:text-[56px]">
           Review research contracts{" "}
-          <span className="bg-gradient-to-r from-flag-blue to-[#5e5ce6] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-flag-blue to-[#34c759] bg-clip-text text-transparent">
             in seconds.
           </span>
         </h1>

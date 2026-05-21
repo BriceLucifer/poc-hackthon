@@ -220,7 +220,7 @@
       "acceptable": null,
       "escalation_to": "Auckland UniServices Ltd — Head of IP. Any IP clause must be referred regardless of wording.",
       "applies_to": ["any"],
-      "keywords": ["intellectual property", "background ip", "foreground ip", "arising ip", "inventions", "copyright assigns", "ownership of results", "patent rights"]
+      "keywords": ["intellectual property", "background ip", "foreground ip", "arising ip", "inventions", "copyright assigns", "ownership of results", "retains ownership", "custodian rights", "patent rights"]
     }
   ]
 }

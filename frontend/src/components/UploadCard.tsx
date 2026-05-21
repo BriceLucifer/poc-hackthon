@@ -63,7 +63,7 @@ export function UploadCard({
 
         {filename ? (
           <div className="flex items-center justify-center gap-3">
-            <div className="size-10 rounded-xl bg-gradient-to-br from-flag-blue/20 to-[#5e5ce6]/20 grid place-items-center">
+            <div className="size-10 rounded-xl bg-gradient-to-br from-flag-blue/20 to-[#34c759]/20 grid place-items-center">
               <FileText className="size-5 text-flag-blue" />
             </div>
             <div className="text-left">
@@ -82,7 +82,7 @@ export function UploadCard({
           </div>
         ) : (
           <>
-            <div className="mx-auto size-12 rounded-2xl bg-gradient-to-br from-flag-blue/15 to-[#5e5ce6]/15 grid place-items-center">
+            <div className="mx-auto size-12 rounded-2xl bg-gradient-to-br from-flag-blue/15 to-[#34c759]/15 grid place-items-center">
               <UploadCloud className="size-6 text-flag-blue" strokeWidth={2.2} />
             </div>
             <h3 className="mt-4 font-display text-[20px] tracking-tight font-semibold">
@@ -108,7 +108,7 @@ export function UploadCard({
         {busy && (
           <div className="absolute inset-x-0 bottom-0 h-1 overflow-hidden rounded-b-[22px]">
             <div
-              className="h-full bg-gradient-to-r from-flag-blue via-[#5e5ce6] to-flag-blue animate-shimmer"
+              className="h-full bg-gradient-to-r from-flag-blue via-[#34c759] to-flag-blue animate-shimmer"
               style={{ backgroundSize: "200% 100%" }}
             />
           </div>

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Quote } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronDown, CircleAlert, HelpCircle, Quote } from "lucide-react";
 import { useState } from "react";
 import type { FlagItem, FlagLevel } from "../lib/api";
 import { FLAG_META } from "../lib/flags";
@@ -14,10 +14,10 @@ export function FlagSection({ level, items }: Props) {
   const empty = items.length === 0;
 
   return (
-    <section className="glass rounded-3xl overflow-hidden">
-      <header className="p-5 sm:p-6 flex items-center justify-between">
+    <section id={`flag-${level}`} className="glass rounded-xl overflow-hidden scroll-mt-24">
+      <header className="p-5 sm:p-6 flex items-center justify-between border-b border-white/60">
         <div className="flex items-center gap-3">
-          <span className={`size-2.5 rounded-full ${meta.dot}`} />
+          <SectionIcon level={level} className={`size-5 ${meta.color}`} />
           <div>
             <h2 className="font-display text-[18px] font-semibold tracking-tight">
               {meta.label}
@@ -52,19 +52,19 @@ function FlagRow({ item, level }: { item: FlagItem; level: FlagLevel }) {
   return (
     <motion.li
       layout
-      className={`rounded-2xl bg-white/80 border border-white/80 ring-1 ${meta.ring} hover:bg-white transition`}
+      className={`rounded-lg bg-white/80 border border-white/80 ring-1 ${meta.ring} hover:bg-white transition`}
     >
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full text-left p-4 sm:p-5 flex items-start gap-3 focus-ring rounded-2xl"
+        className="w-full text-left p-4 sm:p-5 flex items-start gap-3 focus-ring rounded-lg"
       >
-        <span className={`mt-1 size-2 rounded-full ${meta.dot}`} />
+        <span className={`mt-1 h-10 w-1 rounded-full ${meta.dot}`} />
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <span className="text-[12px] font-mono text-ink-500">
               Clause {item.clause_id}
             </span>
-            <span className="font-medium text-[14.5px] text-ink-900 truncate">
+            <span className="min-w-0 flex-1 text-[14.5px] font-medium text-ink-900">
               {item.clause_title || "Untitled clause"}
             </span>
             {item.standard_ref && (
@@ -92,7 +92,7 @@ function FlagRow({ item, level }: { item: FlagItem; level: FlagLevel }) {
             className="overflow-hidden"
           >
             <div className="px-4 sm:px-5 pb-5 pt-1">
-              <div className="rounded-xl bg-ink-50 border border-ink-100 p-4">
+              <div className="rounded-lg bg-ink-50 border border-ink-100 p-4">
                 <div className="flex items-start gap-2 text-[12px] text-ink-500">
                   <Quote className="size-3.5 mt-0.5" />
                   <span className="font-medium uppercase tracking-wider">
@@ -117,4 +117,17 @@ function FlagRow({ item, level }: { item: FlagItem; level: FlagLevel }) {
       </AnimatePresence>
     </motion.li>
   );
+}
+
+function SectionIcon({
+  level,
+  className,
+}: {
+  level: FlagLevel;
+  className: string;
+}) {
+  if (level === "red") return <AlertTriangle className={className} />;
+  if (level === "amber") return <CircleAlert className={className} />;
+  if (level === "green") return <CheckCircle2 className={className} />;
+  return <HelpCircle className={className} />;
 }

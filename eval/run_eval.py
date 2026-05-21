@@ -27,10 +27,17 @@ from agent import ingest, review                 # noqa: E402
 from lib.metrics import score, render_terminal    # noqa: E402
 
 
+def _data_source(filename: str) -> Path:
+    for path in (ROOT / "data" / "sample" / filename, ROOT / "data" / filename):
+        if path.exists():
+            return path
+    return ROOT / "data" / "sample" / filename
+
+
 # Map gold case file → source contract file (under poc/data/)
 CASES = {
     "mta_example_1": {
-        "source": ROOT / "data" / "MTA Example 1.pdf",
+        "source": _data_source("MTA Example 1.pdf"),
         "gold":   ROOT / "eval" / "golden" / "mta_example_1.json",
     },
 }

@@ -13,18 +13,15 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  /* Soft system gradient backdrop, Apple-marketing style */
   .app-bg {
     background:
-      radial-gradient(1200px 600px at 0% -10%, rgba(10,132,255,0.10), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(94,92,230,0.10), transparent 55%),
-      radial-gradient(700px 500px at 50% 100%, rgba(52,199,89,0.06), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.35) 38%, rgba(250,250,251,0.96)),
+      linear-gradient(135deg, rgba(10,132,255,0.08), rgba(52,199,89,0.06) 48%, rgba(255,159,10,0.05)),
       #fafafb;
   }
   .app-bg-dark {
     background:
-      radial-gradient(1200px 600px at 0% -10%, rgba(10,132,255,0.18), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(94,92,230,0.18), transparent 55%),
+      linear-gradient(135deg, rgba(10,132,255,0.18), rgba(52,199,89,0.10)),
       #0b0c0f;
   }
 }

@@ -80,6 +80,7 @@ _RED_CUES: dict[str, list[str]] = {
         r"\bindemnify[^.]{0,120}\binfringement\b",
     ],
     "POS-10": [  # Warranties — red if implied warranties of fitness/merchantability
+        r"\bfitness\s+for\s+(a\s+)?particular\s+purpose\b",
         r"\bfit\s+for\s+(a\s+)?(particular|the\s+sponsor['’]s?\s+commercial)\s+purpose\b",
         r"\bmerchantab",
         r"\bnon[- ]infringement\b",
@@ -109,6 +110,8 @@ _GREEN_CUES: dict[str, list[str]] = {
         r"\bnzd\$?\s*500[,.]?000\b",
         r"\bexcluded?\b[^.]{0,40}\bconsequential\b",
         r"\bexcluded?\b[^.]{0,40}\bindirect\s+loss",
+        r"\bwill\s+not\s+extend\s+to\b[^.]{0,80}\b(consequential|indirect)\b",
+        r"\bshall\s+not\s+include\b[^.]{0,80}\b(consequential|indirect)\b",
     ],
     "POS-10": [r"\bas\s+is\b", r"\bno\s+other\s+warranties\b"],
     "POS-11": [
