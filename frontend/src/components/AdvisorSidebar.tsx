@@ -49,7 +49,7 @@ export function AdvisorSidebar({
         )}
         <button
           onClick={onToggle}
-          className="grid size-9 place-items-center rounded-lg text-white/70 transition hover:bg-white/10 hover:text-white"
+          className="grid size-9 place-items-center rounded-[14px] text-white/70 transition hover:bg-white/10 hover:text-white"
           aria-label={collapsed ? "Expand advisor sidebar" : "Collapse advisor sidebar"}
           title={collapsed ? "Expand advisor" : "Collapse advisor"}
         >
@@ -64,7 +64,7 @@ export function AdvisorSidebar({
       <div className="space-y-1 px-3 py-3">
         <button
           onClick={onNewReview}
-          className={`flex h-11 w-full items-center rounded-lg bg-white/15 text-[14px] font-medium text-white transition hover:bg-white/20 ${
+          className={`flex h-11 w-full items-center rounded-[14px] bg-white/15 text-[14px] font-medium text-white transition hover:bg-white/20 ${
             collapsed ? "justify-center px-0" : "gap-3 px-3 text-left"
           }`}
           title="New review"
@@ -95,7 +95,7 @@ export function AdvisorSidebar({
               <button
                 key={review.id}
                 onClick={() => onSelectReview(review.id)}
-                className={`group flex w-full rounded-lg text-left text-[13px] transition ${
+                className={`group flex w-full rounded-[14px] text-left text-[13px] transition ${
                   collapsed
                     ? "justify-center px-0 py-2.5"
                     : "items-start gap-3 px-3 py-2.5"
@@ -122,17 +122,17 @@ export function AdvisorSidebar({
                     <span className="mt-1 flex items-center gap-2 text-[11px] text-white/42">
                       <span>{formatTime(review.createdAt)}</span>
                       {review.phase !== "done" && review.phase !== "error" && (
-                        <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-white/62">
+                        <span className="rounded-[10px] bg-white/10 px-1.5 py-0.5 text-white/62">
                           {statusLabel(review.phase)}
                         </span>
                       )}
                       {review.phase === "error" && (
-                        <span className="rounded-full bg-red-500/15 px-1.5 py-0.5 text-red-200">
+                        <span className="rounded-[10px] bg-red-500/15 px-1.5 py-0.5 text-red-200">
                           failed
                         </span>
                       )}
                       {riskCount > 0 && (
-                        <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-white/62">
+                        <span className="rounded-[10px] bg-white/10 px-1.5 py-0.5 text-white/62">
                           {riskCount} risk
                         </span>
                       )}
@@ -149,7 +149,7 @@ export function AdvisorSidebar({
 
       <div className="border-t border-white/10 p-3">
         <div
-          className={`flex items-center rounded-lg py-2.5 ${
+          className={`flex items-center rounded-[14px] py-2.5 transition hover:bg-white/10 ${
             collapsed ? "justify-center px-0" : "gap-3 px-3"
           }`}
           title="RGC workspace"

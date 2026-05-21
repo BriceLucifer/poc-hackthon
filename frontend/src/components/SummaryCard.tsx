@@ -15,14 +15,14 @@ export function SummaryCard({ review }: Props) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.05 }}
-      className="glass-strong rounded-lg p-6 sm:p-7"
+      className="rounded-xl border border-ink-200 bg-white p-5 shadow-soft sm:p-6"
     >
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="text-[12px] uppercase tracking-wider text-ink-500">
             Executive summary
           </div>
-          <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-ink-800">
+          <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-ink-800">
             {review.summary}
           </p>
         </div>
@@ -67,11 +67,11 @@ export function SummaryCard({ review }: Props) {
         </div>
       )}
 
-      <div className="divider my-6" />
+      <div className="divider my-5" />
 
       <RiskBar review={review} />
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         {FLAG_ORDER.map((lvl) => (
           <CountTile
             key={lvl}
@@ -121,13 +121,15 @@ function CountTile({ level, count }: { level: FlagLevel; count: number }) {
           ? CheckCircle2
           : HelpCircle;
   return (
-    <div className="rounded-lg bg-white border border-ink-200 p-4 hover:bg-ink-50 transition">
-      <div className="flex items-center gap-2 min-w-0">
-        <Icon className={`size-4 shrink-0 ${meta.color}`} />
-        <span className="text-[12px] font-medium text-ink-700">{meta.label}</span>
+    <div className="rounded-lg border border-ink-200 bg-white p-3 transition hover:bg-ink-50">
+      <div className="flex min-w-0 items-center gap-2">
+        <Icon className={`size-3.5 shrink-0 ${meta.color}`} />
+        <span className="truncate text-[12px] font-medium text-ink-700">
+          {meta.label}
+        </span>
       </div>
       <div className="mt-2 flex items-baseline gap-1.5">
-        <div className={`font-display text-[28px] font-semibold ${meta.color}`}>
+        <div className={`font-display text-[24px] font-semibold ${meta.color}`}>
           {count}
         </div>
         <div className="text-[11px] text-ink-500">{meta.sub}</div>

@@ -1,11 +1,13 @@
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
-  ArrowRight,
   CheckCircle2,
-  FileText,
+  CircleAlert,
+  HelpCircle,
   ShieldAlert,
 } from "lucide-react";
-import type { ContractReview, FlagItem } from "../lib/api";
+import type { ContractReview, FlagLevel } from "../lib/api";
 import { FLAG_META, FLAG_ORDER } from "../lib/flags";
 import { FlagSection } from "./FlagSection";
 import { SummaryCard } from "./SummaryCard";
@@ -17,112 +19,125 @@ interface Props {
 export function ReviewWorkbench({ review }: Props) {
   const posture = riskPosture(review);
   const PostureIcon = posture.icon;
-  const queue = review.flags
-    .filter((flag) => flag.level === "red" || flag.level === "amber")
-    .slice(0, 5);
+  const [activeLevel, setActiveLevel] = useState<FlagLevel>(() =>
+    preferredLevel(review),
+  );
+
+  useEffect(() => {
+    setActiveLevel(preferredLevel(review));
+  }, [review.document_id]);
+
+  const activeItems = review.flags.filter((flag) => flag.level === activeLevel);
 
   return (
-    <div className="space-y-5">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
-        <SummaryCard review={review} />
-        <aside className="glass rounded-xl p-5 lg:sticky lg:top-20">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-[12px] uppercase tracking-wider text-ink-500">
-                Review posture
-              </div>
-              <div className="mt-1 flex items-center gap-2">
-                <PostureIcon className={`size-4 ${posture.color}`} />
-                <span className="font-display text-[18px] font-semibold tracking-tight">
-                  {posture.label}
-                </span>
-              </div>
-            </div>
-            <span className={`pill ${posture.chip}`}>{posture.badge}</span>
-          </div>
+    <div className="space-y-4 pt-2">
+      <SummaryCard review={review} />
 
-          <div className="mt-4 rounded-lg border border-white/80 bg-white/70 p-3">
-            <div className="text-[11px] uppercase tracking-wider text-ink-500">
-              Contract
-            </div>
-            <div className="mt-1 flex items-start gap-2">
-              <FileText className="mt-0.5 size-4 shrink-0 text-flag-blue" />
-              <div className="min-w-0">
-                <div className="truncate text-[13px] font-medium text-ink-900">
-                  {review.filename}
-                </div>
-                <div className="text-[12px] text-ink-500">
-                  {review.contract_type} · {review.flags.length} clauses
-                </div>
-              </div>
+      <section className="rounded-xl border border-ink-200 bg-white p-3 shadow-soft">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1 pb-3">
+          <div className="flex items-center gap-2">
+            <PostureIcon className={`size-4 ${posture.color}`} />
+            <div className="text-[13px] font-semibold text-ink-900">
+              {posture.label}
             </div>
           </div>
+          <span className={`pill ${posture.chip}`}>{posture.badge}</span>
+        </div>
 
-          <div className="mt-5">
-            <div className="flex items-center justify-between">
-              <div className="text-[12px] uppercase tracking-wider text-ink-500">
-                Reviewer queue
-              </div>
-              <span className="text-[12px] text-ink-500">
-                {queue.length || "clear"}
-              </span>
-            </div>
+        <div className="grid gap-2 md:grid-cols-4">
+          {FLAG_ORDER.map((level) => (
+            <RiskTab
+              key={level}
+              level={level}
+              count={review.counts[level] ?? 0}
+              active={level === activeLevel}
+              onClick={() => setActiveLevel(level)}
+            />
+          ))}
+        </div>
+      </section>
 
-            {queue.length === 0 ? (
-              <div className="mt-3 rounded-lg border border-flag-green/20 bg-flag-green/10 p-3 text-[13px] leading-relaxed text-ink-700">
-                No red or amber items. Review blue items only if the matter is
-                material to the deal.
-              </div>
-            ) : (
-              <ul className="mt-3 space-y-2">
-                {queue.map((flag, index) => (
-                  <QueueItem key={`${flag.level}-${flag.clause_id}-${index}`} flag={flag} />
-                ))}
-              </ul>
-            )}
-          </div>
-        </aside>
-      </div>
-
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        {FLAG_ORDER.map((level) => (
-          <FlagSection
-            key={level}
-            level={level}
-            items={review.flags.filter((flag) => flag.level === level)}
-          />
-        ))}
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeLevel}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <FlagSection level={activeLevel} items={activeItems} />
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
 
-function QueueItem({ flag }: { flag: FlagItem }) {
-  const meta = FLAG_META[flag.level];
+function RiskTab({
+  level,
+  count,
+  active,
+  onClick,
+}: {
+  level: FlagLevel;
+  count: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const meta = FLAG_META[level];
+  const Icon =
+    level === "red"
+      ? AlertTriangle
+      : level === "amber"
+        ? CircleAlert
+        : level === "green"
+          ? CheckCircle2
+          : HelpCircle;
+
   return (
-    <li>
-      <a
-        href={`#flag-${flag.level}`}
-        className="group block rounded-lg border border-white/80 bg-white/75 p-3 text-left transition hover:-translate-y-0.5 hover:bg-white hover:shadow-soft focus-ring"
+    <button
+      onClick={onClick}
+      className={`relative flex min-h-16 items-center justify-between overflow-hidden rounded-lg border px-3 py-2.5 text-left transition focus-ring ${
+        active
+          ? "border-ink-900 text-white"
+          : "border-ink-200 bg-white text-ink-800 hover:bg-ink-50"
+      }`}
+    >
+      {active && (
+        <motion.span
+          layoutId="review-risk-tab-active"
+          className="absolute inset-0 rounded-lg bg-ink-900"
+          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        />
+      )}
+      <span className="relative flex min-w-0 items-center gap-2">
+        <Icon className={`size-4 shrink-0 ${active ? "text-white" : meta.color}`} />
+        <span className="min-w-0">
+          <span className="block truncate text-[13px] font-semibold">
+            {meta.label}
+          </span>
+          <span className={`block truncate text-[11px] ${active ? "text-white/65" : "text-ink-500"}`}>
+            {meta.sub}
+          </span>
+        </span>
+      </span>
+      <span
+        className={`relative ml-3 rounded-full px-2 py-0.5 text-[12px] font-medium ${
+          active ? "bg-white/14 text-white" : "bg-ink-100 text-ink-600"
+        }`}
       >
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-2">
-            <span className={`size-2 shrink-0 rounded-full ${meta.dot}`} />
-            <span className="truncate text-[12px] font-mono text-ink-500">
-              Clause {flag.clause_id}
-            </span>
-          </div>
-          <ArrowRight className="size-3.5 shrink-0 text-ink-400 transition group-hover:translate-x-0.5 group-hover:text-ink-700" />
-        </div>
-        <div className="mt-1 line-clamp-2 text-[13px] font-medium leading-snug text-ink-900">
-          {flag.clause_title || "Untitled clause"}
-        </div>
-        <div className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-ink-500">
-          {flag.rationale}
-        </div>
-      </a>
-    </li>
+        {count}
+      </span>
+    </button>
   );
+}
+
+function preferredLevel(review: ContractReview): FlagLevel {
+  for (const level of FLAG_ORDER) {
+    if ((review.counts[level] ?? 0) > 0) {
+      return level;
+    }
+  }
+  return "green";
 }
 
 function riskPosture(review: ContractReview): {

@@ -188,20 +188,21 @@ export default function App() {
         <Header llmReady={llmReady} llmStatus={llmStatus} />
 
         <main className="mx-auto max-w-6xl px-6 pb-24">
-          <Hero />
+          {!activeSession && <Hero />}
 
           <div className="mt-2 grid gap-6">
-            <UploadCard
-              onFile={runPipeline}
-              busy={false}
-              filename={null}
-            />
-
             {!activeSession && (
-              <SamplePicker onPick={runSample} busy={false} />
-            )}
+              <>
+                <UploadCard
+                  onFile={runPipeline}
+                  busy={false}
+                  filename={null}
+                />
 
-            <EvalScorecard />
+                <SamplePicker onPick={runSample} busy={false} />
+                <EvalScorecard />
+              </>
+            )}
 
             <AnimatePresence>
               {activeBusy && (
@@ -220,7 +221,7 @@ export default function App() {
               </motion.div>
             )}
 
-            {activeSession?.classification && (
+            {activeSession?.classification && !activeSession.review && (
               <ContractTypeBadge
                 type={activeSession.classification.contract_type}
                 confidence={activeSession.classification.confidence}

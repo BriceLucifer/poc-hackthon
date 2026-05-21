@@ -14,7 +14,7 @@ contracting positions and emits a four-flag report (🟢 Green / 🟡 Amber /
 ```
 poc/
 ├── backend/    FastAPI + Azure OpenAI agent + eval observability
-├── frontend/   React + Vite + Tailwind (Apple-style UI)
+├── frontend/   React + Vite + Tailwind (OpenAI-style review workspace)
 ├── data/       UoA Positions PDF + UoA templates + redacted examples
 └── eval/       Golden labels + run_eval.py + reports/
 ```
@@ -25,12 +25,12 @@ poc/
 
 The system end-to-end:
 
-1. **Upload** a contract (PDF or DOCX) — drag-and-drop or "Try MTA Example" pill.
+1. **Start one or more reviews** — upload a PDF/DOCX/TXT/MD or run a sample contract.
 2. **Parse** — pdfplumber for text-layer pages; **GPT-4o vision OCR fallback** for scanned pages.
 3. **Classify** — keyword baseline + LLM refinement against 13 contract types (MTA, CTRA, SRA, CDA, DTA, DAA, MSA, …).
 4. **Compare** — clause-by-clause against the **21 UoA Preferred Contracting Positions** (Sept 2025 draft) plus the matching UoA template DOCX.
 5. **Refine** — GPT-4o re-grades the deterministic flags using the full Positions JSON + template wording.
-6. **Report** — executive summary + 4 flag sections + per-clause rationale + escalation route.
+6. **Report** — executive summary + animated Red/Amber/Blue/Green tabs + per-clause rationale + escalation route.
 
 ### Eval baseline (MTA Example 1, hand-labelled gold)
 
@@ -49,8 +49,9 @@ Numbers reproduced via `uv run python eval/run_eval.py --save`.
 ### Runtime characteristics
 
 - **Deterministic** — `temperature=0` on every LLM call so re-runs match.
-- **Cost-attributable** — every API call (classify, augment, summary, vision OCR) records tokens / latency / USD; surfaced in the UI's metrics chip.
+- **Cost-attributable** — every API call (classify, review, summary, vision OCR) records tokens / latency / USD; surfaced in the UI's metrics chip.
 - **Auditable** — each flag carries `clause_id`, `standard_ref` (e.g. `UoA Position #POS-08`), and a rationale that names the escalation route.
+- **Multi-review UI** — reviews can run concurrently; the left sidebar behaves like a ChatGPT-style Recents list so reviewers can switch between in-flight and completed reports.
 
 ---
 
@@ -142,6 +143,7 @@ OpenAPI docs: <http://localhost:8000/docs>
 | `POST` | `/api/chat` | Free-form Q&A about the loaded document |
 | `GET`  | `/api/samples` | List pre-loaded sample contracts |
 | `POST` | `/api/samples/{id}/load` | One-shot load a sample |
+| `GET`  | `/api/templates` | Diagnostic template coverage by contract type |
 | `GET`  | `/api/eval/latest` | Latest eval run (for the scorecard) |
 
 ---
@@ -158,18 +160,18 @@ The Vite dev server proxies `/api/*` to `http://localhost:8000`.
 
 ### What you'll see
 
-- **Drop / sample** — drag a PDF/DOCX or click *Try MTA Example*.
-- **Identified contract type** card with confidence and rationale.
-- **Executive summary** with the references used (e.g. "Compared against: UoA Preferred Contracting Positions + UoA Template — UoA-MTA_incoming.docx").
-- **Metrics chip**: model · n_calls · tokens · latency · USD cost.
-- **Four flag sections** (Red / Amber / Blue / Green) — every clause expandable to show snippet + rationale + standard ref.
-- **Pipeline evaluation** scorecard at the top (collapsed by default) — accuracy / Macro-F1 / per-level table / mismatches.
-- **Download report** as Markdown (top right).
-- **Chat dock** (bottom right) for follow-up Q&A about the loaded document.
+- **OpenAI-style left sidebar** — New review plus a Recents list of every review session. In-flight reviews show their current phase; completed reviews show contract type and risk count.
+- **Concurrent review flow** — start another review while one is still processing, then switch between reports from the sidebar.
+- **Clean report page** — once processing completes, the upload hero disappears and the page keeps only the final report.
+- **Executive summary** with references used, model/cost/tokens/latency metrics, and a Markdown download.
+- **Animated risk tabs** — Red / Amber / Blue / Green tabs share one source of truth (`FLAG_META`). Green renders as `Green Flags` / `Aligned with UoA Position`.
+- **Expandable clause rows** — each clause exposes snippet, rationale, and standard reference.
+- **Advisor rail** — right-side assistant panel with Markdown-rendered responses for follow-up Q&A about the selected document.
+- **Pipeline evaluation** scorecard — latest eval metrics for the gold case.
 
 ### Stack
 
-React 18 + TypeScript + Vite · TailwindCSS (Apple-flavoured tokens: SF font stack, glass cards, soft shadows, four-flag colour system) · `framer-motion` for animation · `lucide-react` icons.
+React 18 + TypeScript + Vite · TailwindCSS (OpenAI-style white/grey surfaces, restrained borders, four-flag colour system) · `framer-motion` for tab and panel motion · `react-markdown` for Advisor replies · `lucide-react` icons.
 
 ---
 

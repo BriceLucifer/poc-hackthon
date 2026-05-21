@@ -50,6 +50,31 @@
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-900/15
            focus-visible:ring-offset-2 focus-visible:ring-offset-white;
   }
+  .advisor-markdown {
+    @apply text-[14px] leading-7 text-ink-900;
+  }
+  .advisor-markdown p {
+    @apply my-0;
+  }
+  .advisor-markdown p + p {
+    @apply mt-3;
+  }
+  .advisor-markdown strong {
+    @apply font-semibold text-ink-900;
+  }
+  .advisor-markdown ol,
+  .advisor-markdown ul {
+    @apply my-0 space-y-3 pl-5;
+  }
+  .advisor-markdown ol {
+    @apply list-decimal;
+  }
+  .advisor-markdown ul {
+    @apply list-disc;
+  }
+  .advisor-markdown li > p {
+    @apply inline;
+  }
 }
 
 /* Subtle scrollbar */
