@@ -15,7 +15,7 @@ export function SummaryCard({ review }: Props) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.05 }}
-      className="glass-strong rounded-3xl p-6 sm:p-7"
+      className="glass-strong rounded-lg p-6 sm:p-7"
     >
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0 flex-1">
@@ -57,7 +57,7 @@ export function SummaryCard({ review }: Props) {
             {review.references_used.map((r) => (
               <span
                 key={r}
-                className="rounded-full bg-white/70 border border-white/70 px-2 py-0.5 text-[11px]"
+                className="rounded-full bg-white border border-ink-200 px-2 py-0.5 text-[11px]"
                 title={r}
               >
                 {r.length > 50 ? r.slice(0, 50) + "…" : r}
@@ -121,7 +121,7 @@ function CountTile({ level, count }: { level: FlagLevel; count: number }) {
           ? CheckCircle2
           : HelpCircle;
   return (
-    <div className="rounded-lg bg-white/70 border border-white/70 p-4 hover:bg-white transition">
+    <div className="rounded-lg bg-white border border-ink-200 p-4 hover:bg-ink-50 transition">
       <div className="flex items-center gap-2 min-w-0">
         <Icon className={`size-4 shrink-0 ${meta.color}`} />
         <span className="text-[12px] font-medium text-ink-700">{meta.label}</span>

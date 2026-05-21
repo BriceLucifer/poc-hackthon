@@ -33,7 +33,7 @@ export function UploadCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="glass-strong rounded-3xl p-1.5"
+      className="glass-strong rounded-lg p-1"
     >
       <div
         onDragOver={(e) => {
@@ -46,10 +46,10 @@ export function UploadCard({
           setDrag(false);
           handleFiles(e.dataTransfer.files);
         }}
-        className={`relative rounded-[22px] border-2 border-dashed transition-colors p-10 sm:p-14 text-center ${
+        className={`relative rounded-md border border-dashed transition-colors p-10 sm:p-14 text-center ${
           drag
-            ? "border-flag-blue/60 bg-flag-blue/[0.04]"
-            : "border-ink-200 bg-white/40"
+            ? "border-ink-900 bg-ink-50"
+            : "border-ink-200 bg-white"
         }`}
       >
         <input
@@ -63,8 +63,8 @@ export function UploadCard({
 
         {filename ? (
           <div className="flex items-center justify-center gap-3">
-            <div className="size-10 rounded-xl bg-gradient-to-br from-flag-blue/20 to-[#34c759]/20 grid place-items-center">
-              <FileText className="size-5 text-flag-blue" />
+            <div className="size-10 rounded-md bg-ink-100 grid place-items-center">
+              <FileText className="size-5 text-ink-700" />
             </div>
             <div className="text-left">
               <div className="text-[14px] font-medium">{filename}</div>
@@ -73,7 +73,7 @@ export function UploadCard({
             {onClear && (
               <button
                 onClick={onClear}
-                className="ml-2 grid size-7 place-items-center rounded-full bg-white/70 hover:bg-white border border-ink-200 focus-ring"
+                className="ml-2 grid size-7 place-items-center rounded-full bg-white hover:bg-ink-50 border border-ink-200 focus-ring"
                 aria-label="Clear file"
               >
                 <X className="size-3.5" />
@@ -82,8 +82,8 @@ export function UploadCard({
           </div>
         ) : (
           <>
-            <div className="mx-auto size-12 rounded-2xl bg-gradient-to-br from-flag-blue/15 to-[#34c759]/15 grid place-items-center">
-              <UploadCloud className="size-6 text-flag-blue" strokeWidth={2.2} />
+            <div className="mx-auto size-12 rounded-md bg-ink-100 grid place-items-center">
+              <UploadCloud className="size-6 text-ink-700" strokeWidth={2.2} />
             </div>
             <h3 className="mt-4 font-display text-[20px] tracking-tight font-semibold">
               Drop a contract to begin
@@ -108,7 +108,7 @@ export function UploadCard({
         {busy && (
           <div className="absolute inset-x-0 bottom-0 h-1 overflow-hidden rounded-b-[22px]">
             <div
-              className="h-full bg-gradient-to-r from-flag-blue via-[#34c759] to-flag-blue animate-shimmer"
+              className="h-full bg-ink-900 animate-shimmer"
               style={{ backgroundSize: "200% 100%" }}
             />
           </div>

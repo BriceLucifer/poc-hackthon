@@ -16,10 +16,10 @@ export function ContractTypeBadge({ type, confidence, rationale }: Props) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="glass rounded-2xl p-5 flex items-start gap-4"
+      className="glass rounded-lg p-5 flex items-start gap-4"
     >
-      <div className="size-9 shrink-0 rounded-xl bg-flag-blue/10 grid place-items-center">
-        <FileSearch className="size-5 text-flag-blue" />
+      <div className="size-9 shrink-0 rounded-md bg-ink-100 grid place-items-center">
+        <FileSearch className="size-5 text-ink-700" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-[12px] uppercase tracking-wider text-ink-500">
@@ -45,7 +45,7 @@ export function ContractTypeBadge({ type, confidence, rationale }: Props) {
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="h-full bg-gradient-to-r from-flag-blue to-[#34c759]"
+            className="h-full bg-ink-900"
           />
         </div>
       </div>

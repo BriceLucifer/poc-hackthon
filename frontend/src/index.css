@@ -7,31 +7,26 @@
     height: 100%;
   }
   body {
-    background: #fafafb;
+    background: #f7f7f4;
     color: #0b0c0f;
     font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   .app-bg {
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.35) 38%, rgba(250,250,251,0.96)),
-      linear-gradient(135deg, rgba(10,132,255,0.08), rgba(52,199,89,0.06) 48%, rgba(255,159,10,0.05)),
-      #fafafb;
+    background: #f7f7f4;
   }
   .app-bg-dark {
-    background:
-      linear-gradient(135deg, rgba(10,132,255,0.18), rgba(52,199,89,0.10)),
-      #0b0c0f;
+    background: #0b0c0f;
   }
 }
 
 @layer components {
   .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-white/60 shadow-glass;
+    @apply bg-white border border-ink-200 shadow-soft;
   }
   .glass-strong {
-    @apply bg-white/85 backdrop-blur-2xl border border-white/70 shadow-glass;
+    @apply bg-white border border-ink-200 shadow-soft;
   }
   .pill {
     @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
@@ -42,22 +37,17 @@
            disabled:cursor-not-allowed select-none;
   }
   .btn-primary {
-    @apply btn text-white;
-    background: linear-gradient(180deg, #1a8bff 0%, #0a6cff 100%);
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.4) inset,
-      0 8px 16px -8px rgba(10,108,255,0.6),
-      0 2px 6px rgba(10,108,255,0.25);
+    @apply btn bg-ink-900 text-white hover:bg-ink-800;
+    box-shadow: 0 1px 2px rgba(15,17,21,0.12);
   }
-  .btn-primary:hover { filter: brightness(1.05); }
   .btn-ghost {
-    @apply btn bg-white/70 text-ink-900 border border-white/70 hover:bg-white;
+    @apply btn bg-white text-ink-900 border border-ink-200 hover:bg-ink-50;
   }
   .divider {
-    @apply h-px w-full bg-gradient-to-r from-transparent via-ink-200 to-transparent;
+    @apply h-px w-full bg-ink-200;
   }
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-flag-blue/40
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-900/15
            focus-visible:ring-offset-2 focus-visible:ring-offset-white;
   }
 }

@@ -35,7 +35,7 @@ export function PipelineStatus({ phase, filename }: Props) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.28 }}
-      className="glass rounded-2xl p-4 sm:p-5"
+      className="glass rounded-lg p-4 sm:p-5"
     >
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
@@ -50,7 +50,7 @@ export function PipelineStatus({ phase, filename }: Props) {
         {isBusy && (
           <div className="relative size-8 shrink-0">
             <div className="absolute inset-0 rounded-full border border-ink-200" />
-            <div className="absolute inset-0 rounded-full border-2 border-flag-blue border-t-transparent animate-spin" />
+            <div className="absolute inset-0 rounded-full border-2 border-ink-900 border-t-transparent animate-spin" />
           </div>
         )}
       </div>
@@ -60,7 +60,7 @@ export function PipelineStatus({ phase, filename }: Props) {
           initial={{ width: 0 }}
           animate={{ width: `${PROGRESS[phase]}%` }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className={`h-full ${phase === "error" ? "bg-flag-red" : "bg-gradient-to-r from-flag-blue via-flag-green to-flag-amber"}`}
+          className={`h-full ${phase === "error" ? "bg-flag-red" : "bg-ink-900"}`}
         />
       </div>
 
@@ -74,10 +74,10 @@ export function PipelineStatus({ phase, filename }: Props) {
               key={step.phase}
               className={`flex min-w-0 items-center gap-2 rounded-lg px-2.5 py-2 text-[12px] ring-1 ${
                 complete
-                  ? "bg-flag-green/10 text-flag-green ring-flag-green/20"
+                  ? "bg-ink-900 text-white ring-ink-900"
                   : active
-                    ? "bg-flag-blue/10 text-flag-blue ring-flag-blue/20"
-                    : "bg-white/70 text-ink-500 ring-white/80"
+                    ? "bg-ink-100 text-ink-900 ring-ink-200"
+                    : "bg-white text-ink-500 ring-ink-200"
               }`}
             >
               <Icon className="size-3.5 shrink-0" />

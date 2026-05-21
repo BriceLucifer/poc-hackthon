@@ -40,12 +40,12 @@ export function SamplePicker({ onPick, busy }: Props) {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.1 }}
-      className="glass rounded-2xl p-4 sm:p-5"
+      className="glass rounded-lg p-4 sm:p-5"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <div className="grid size-8 place-items-center rounded-lg bg-flag-blue/10">
-            <FolderOpen className="size-4 text-flag-blue" />
+          <div className="grid size-8 place-items-center rounded-md bg-ink-100">
+            <FolderOpen className="size-4 text-ink-700" />
           </div>
           <div>
             <div className="text-[13px] font-semibold tracking-tight text-ink-900">
@@ -63,7 +63,7 @@ export function SamplePicker({ onPick, busy }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search samples"
-            className="h-9 w-full rounded-lg border border-ink-200 bg-white/80 pl-8 pr-3 text-[13px] outline-none transition focus:border-flag-blue/40 focus:ring-2 focus:ring-flag-blue/15"
+            className="h-9 w-full rounded-lg border border-ink-200 bg-white pl-8 pr-3 text-[13px] outline-none transition focus:border-ink-500 focus:ring-2 focus:ring-ink-900/10"
           />
         </label>
       </div>
@@ -75,8 +75,8 @@ export function SamplePicker({ onPick, busy }: Props) {
             onClick={() => setType(t)}
             className={`shrink-0 rounded-full border px-3 py-1 text-[11.5px] font-medium transition ${
               type === t
-                ? "border-flag-blue/25 bg-flag-blue/10 text-flag-blue"
-                : "border-white/80 bg-white/70 text-ink-600 hover:bg-white"
+                ? "border-ink-900 bg-ink-900 text-white"
+                : "border-ink-200 bg-white text-ink-600 hover:bg-ink-50"
             }`}
           >
             {t}
@@ -90,10 +90,10 @@ export function SamplePicker({ onPick, busy }: Props) {
             key={s.id}
             onClick={() => onPick(s.id)}
             disabled={busy}
-            className="group flex min-h-20 items-start gap-3 rounded-lg border border-white/80 bg-white/75 p-3 text-left shadow-soft transition hover:-translate-y-0.5 hover:bg-white disabled:opacity-50 focus-ring"
+            className="group flex min-h-20 items-start gap-3 rounded-lg border border-ink-200 bg-white p-3 text-left transition hover:-translate-y-0.5 hover:bg-ink-50 disabled:opacity-50 focus-ring"
             title={s.description}
           >
-            <div className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg bg-ink-50 text-flag-blue ring-1 ring-ink-100 group-hover:bg-flag-blue/10">
+            <div className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-md bg-ink-50 text-ink-600 ring-1 ring-ink-100 group-hover:bg-ink-100">
               <FileText className="size-4" />
             </div>
             <div className="min-w-0 flex-1">
