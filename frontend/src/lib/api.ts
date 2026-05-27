@@ -115,7 +115,7 @@ export interface HealthResponse {
   max_upload_mb: number;
 }
 
-const BASE = "/api";
+const BASE = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
 async function jfetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(BASE + path, init);
